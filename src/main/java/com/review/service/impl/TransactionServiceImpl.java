@@ -4,11 +4,13 @@ import com.review.enums.AccountType;
 import com.review.exception.AccountOwnerShipException;
 import com.review.exception.BadRequestException;
 import com.review.exception.BalanceNotSuffincientException;
+import com.review.exception.UnderConstructionException;
 import com.review.model.Account;
 import com.review.model.Transaction;
 import com.review.repository.AccountRepository;
 import com.review.repository.TransactionRepository;
 import com.review.service.TransactionService;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -17,6 +19,8 @@ import java.util.UUID;
 
 public class TransactionServiceImpl implements TransactionService {
 
+    @Value("${under_construction}")
+    private  boolean underConstruction;
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
 
@@ -35,21 +39,26 @@ public class TransactionServiceImpl implements TransactionService {
          - if both accounts are checking, if not, one of them saving, it need to be same userID
          */
 
-        validateAccount(sender, receiver);
-        checkAccountOwnerShip(sender,receiver);
-        executeBalanceAndUpdateIfRequire(amount,sender,receiver);
+        if (!underConstruction) {
+
+            validateAccount(sender, receiver);
+            checkAccountOwnerShip(sender, receiver);
+            executeBalanceAndUpdateIfRequire(amount, sender, receiver);
 
         /*
             after all validations are completed, and money is transferred,
             we need to create Transactions object and save return
          */
 
-        Transaction transaction = Transaction.builder().amount(amount)
-                .sender(sender.getId()).receiver(receiver.getId()).createDate(creationDate).message(message).build();
+            Transaction transaction = Transaction.builder().amount(amount)
+                    .sender(sender.getId()).receiver(receiver.getId()).createDate(creationDate).message(message).build();
 
 
-        // save into the db and return it
-        return transactionRepository.save(transaction);
+            // save into the db and return it
+            return transactionRepository.save(transaction);
+        }else {
+            throw new UnderConstructionException("App is under construction, please try again later");
+        }
     }
 
     private void executeBalanceAndUpdateIfRequire(BigDecimal amount, Account sender, Account receiver)
@@ -87,7 +96,7 @@ public class TransactionServiceImpl implements TransactionService {
     private void validateAccount(Account sender, Account receiver) {
 
         /**
-         - if any og the account null
+         -  if any the account null
          -  if account ids are the same(same account)
          -  if the account exist in the database
          */
@@ -103,17 +112,15 @@ public class TransactionServiceImpl implements TransactionService {
         findAccountById(sender.getId());
         findAccountById(receiver.getId());
 
-
     }
 
     private void findAccountById(UUID id) {
         accountRepository.findById(id);
-
     }
 
 
     @Override
     public List<Transaction> findAllTransaction() {
-        return null;
+        return transactionRepository.findAll();
     }
 }

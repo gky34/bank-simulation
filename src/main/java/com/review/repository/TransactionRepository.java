@@ -16,4 +16,9 @@ public class TransactionRepository
         transactionsList.add(transaction);
         return transaction;
     }
+
+    public List<Transaction> findAll() {
+
+        return transactionsList;
+    }
 }
