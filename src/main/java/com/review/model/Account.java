@@ -1,7 +1,7 @@
 package com.review.model;
 
+import com.review.enums.AccountStatus;
 import com.review.enums.AccountType;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,11 +11,13 @@ import java.util.UUID;
 
 @Data
 @Builder
-@AllArgsConstructor
 public class Account {
+
     private UUID id;
     private BigDecimal balance;
     private AccountType accountType;
     private Date creationDate;
     private Long userId;
+    private AccountStatus accountStatus;
+
 }

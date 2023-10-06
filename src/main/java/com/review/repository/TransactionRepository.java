@@ -7,18 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class TransactionRepository
-{
-    public static List<Transaction> transactionsList = new ArrayList<>();
+public class TransactionRepository {
 
-    public Transaction save(Transaction transaction)
-    {
-        transactionsList.add(transaction);
+    public static List<Transaction> transactionList = new ArrayList<>();
+
+    public Transaction save(Transaction transaction){
+        transactionList.add(transaction);
         return transaction;
     }
 
     public List<Transaction> findAll() {
-
-        return transactionsList;
+        return transactionList;
     }
 }
