@@ -3,6 +3,10 @@ package com.review.model;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
@@ -10,9 +14,19 @@ import java.util.UUID;
 @Builder
 public class Transaction {
 
+    @NotNull
     private UUID sender;
+
+    @NotNull
     private UUID receiver;
+
+    @NotNull
+    @Positive
     private BigDecimal amount;
+
+    @NotNull
+    @Size(min=2, max = 250)
+    @Pattern(regexp = "^[a-zA-Z0-9]*$")         // We don't accept any special character with this expression
     private String message;
     private Date createDate;
 
